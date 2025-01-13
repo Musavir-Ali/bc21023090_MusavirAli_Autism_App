@@ -83,7 +83,7 @@ class AddRecommendation extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.all(5.0),
                               child: CommonButton(
-                                title: 'Save Recommendations',
+                                title: 'Send Recommendations',
                                 bgColor: const Color(successColor).value,
                                 onPressed: () {
                                   _saveRecommendation(
@@ -129,7 +129,7 @@ class AddRecommendation extends StatelessWidget {
       await FirebaseFirestore.instance.collection('recommendations').add(recommendationData);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Recommendation saved successfully")),
+        const SnackBar(content: Text("Recommendation send successfully")),
       );
       Navigator.of(context).pop();
     } catch (e) {

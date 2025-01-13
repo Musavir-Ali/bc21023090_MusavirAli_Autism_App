@@ -16,15 +16,15 @@ class HomeScreenModel {
   int index;
   VoidCallback? onPressed;
   String title;
-  List<Widget> actions; // List to hold action widgets for each screen
+  List<Widget> actions; 
   Widget screenWidget;
   HomeScreenModel(this.index, this.title, this.screenWidget,
       {this.actions =
-          const []}); // Include actions parameter in the constructor
+          const []});
 }
 
 List<HomeScreenModel> professionalScreensList = [
-  HomeScreenModel(0, 'All Users', const UsersScreen()),
+  HomeScreenModel(0, 'All Users',  UsersScreen()),
   HomeScreenModel(1, 'Add Recommendation', AddRecommendation()),
   HomeScreenModel(
     2,

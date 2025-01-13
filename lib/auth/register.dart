@@ -18,7 +18,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
   bool _isPasswordVisible = false;
-  String? selectedRole; // Hold the selected dropdown value
+  String? selectedRole; 
 
   void _togglePasswordView() {
     setState(() {
@@ -41,114 +41,123 @@ class _RegisterState extends State<Register> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(widthSpace(viewPadding)),
-          child: Column(
-            children: [
-              SizedBox(height: heightSpace(4)),
-              Image.asset('assets/Support.png'),
-              SizedBox(height: heightSpace(3.5)),
-              const CustomText(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: heightSpace(4)),
+                Image.asset('assets/Support.png'),
+                SizedBox(height: heightSpace(3.5)),
+                const CustomText(
                 text: 'Create your account',
                 fontSize: 2.2,
                 weight: FontWeight.bold,
-              ),
-              SizedBox(height: heightSpace(2)),
-              CustomTextField(
+                ),
+                SizedBox(height: heightSpace(2)),
+                CustomTextField(
                 controller: AuthHelper.accountController.userName,
-                hintText: 'Username',
+                hintText: 'Email',
                 textInputType: TextInputType.emailAddress,
                 prefixIcon: SvgPicture.asset('assets/icons/email.svg'),
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
-                    AuthHelper.accountController.userName.clear();
+                  AuthHelper.accountController.userName.clear();
                   },
                 ),
                 validator: (value) {
                   if (value?.isNotEmpty == true) {
-                    return null;
+                  return null;
                   }
                   return 'This field must not be Empty';
                 },
-              ),
-              SizedBox(height: heightSpace(1.5)),
-              CustomTextField(
+                ),
+                SizedBox(height: heightSpace(1.5)),
+                CustomTextField(
                 controller: AuthHelper.accountController.password,
                 hintText: 'Password',
                 obscureText: !_isPasswordVisible,
                 prefixIcon: SvgPicture.asset('assets/icons/key.svg'),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   ),
                   onPressed: _togglePasswordView,
                 ),
                 validator: (value) {
                   if (AuthHelper.accountController.isLoginAction) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your password';
-                    }
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
                   }
                   return null;
                 },
-              ),
-              SizedBox(height: heightSpace(1.5)),
-              CustomTextField(
-                controller: AuthHelper.accountController.password,
+                ),
+                SizedBox(height: heightSpace(1.5)),
+                CustomTextField(
+                controller: AuthHelper.accountController.reEnterPassword,
                 hintText: 'Reenter Password',
                 obscureText: !_isPasswordVisible,
                 prefixIcon: SvgPicture.asset('assets/icons/key.svg'),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
                   ),
                   onPressed: _togglePasswordView,
                 ),
                 validator: (value) {
                   if (AuthHelper.accountController.isLoginAction) {
-                    if (value == null || value.isEmpty) {
-                      return 'Renter your password';
-                    }
+                  if (value == null || value.isEmpty) {
+                    return 'Renter your password';
+                  }
                   }
                   return null;
                 },
-              ),
-              SizedBox(height: heightSpace(1.5)),
-              DropdownButtonFormField<String>(
+                ),
+                SizedBox(height: heightSpace(1.5)),
+                DropdownButtonFormField<String>(
                 value: selectedRole,
                 hint: const CustomText(text: 'Select Role'),
                 onChanged: (String? newValue) {
                   setState(() {
-                    selectedRole = newValue;
-                    print(selectedRole);
+                  selectedRole = newValue;
+                  print(selectedRole);
                   });
                 },
                 items: ['Professional', 'User', 'Admin'].map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
+                  value: value,
+                  child: Text(value),
                   );
                 }).toList(),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-              ),
-              SizedBox(height: heightSpace(3)),
-              CommonButton(
+                ),
+                SizedBox(height: heightSpace(3)),
+                CommonButton(
                 title: 'Continue',
                 onPressed: () {
+                  if (AuthHelper.accountController.password.text == AuthHelper.accountController.reEnterPassword.text) {
                   AuthHelper.signUp(
                     AuthHelper.accountController.userName.text,
                     AuthHelper.accountController.password.text,
-                    selectedRole ?? '', // Add the missing third argument
-                    // selectedRole ?? '', // Add the missing third argument
+                    selectedRole ?? '', 
                   );
+                  } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Password do not match"),
+                    ),
+                  );
+                  }
                 },
                 isLoading: AuthHelper.accountController.isLoading.value,
                 bgColor: successColor,
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

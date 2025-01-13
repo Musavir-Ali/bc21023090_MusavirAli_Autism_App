@@ -23,6 +23,9 @@ class AuthHelper {
       );
       log("User signed up successfully: ${userCredential.user?.email}");
       await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set({'email': email, 'role': role});
+      AuthHelper.accountController.userName.clear();
+      AuthHelper.accountController.password.clear();
+      AuthHelper.accountController.reEnterPassword.clear();
       Get.back();
     } on FirebaseAuthException catch (e) {
       log("Error during sign up: ${e.message}");
@@ -38,7 +41,8 @@ class AuthHelper {
       );
       log("User logged in successfully: ${userCredential.user?.email}");
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).get();
-
+      AuthHelper.accountController.userName.clear();
+      AuthHelper.accountController.password.clear();
       if (userDoc.exists) {
         HomeScreenController homeScreenController = Get.find();
         String role = userDoc['role'];
@@ -59,8 +63,6 @@ class AuthHelper {
 static Future<void> redirectBasedOnRole(String role, String userId) async {
   try {
     DocumentSnapshot profileSnapshot;
-
-    // Use `basic_profiles` for Admin and Professional, `profiles` for User
     if (role == 'Admin' || role == 'Professional') {
       profileSnapshot = await FirebaseFirestore.instance
           .collection('basic_profiles')
@@ -75,8 +77,6 @@ static Future<void> redirectBasedOnRole(String role, String userId) async {
       Get.snackbar("Error", "Invalid role. Cannot redirect.");
       return;
     }
-
-    // Redirect based on profile existence and role
     if (profileSnapshot.exists) {
       Get.offAll(() => HomeScreen());
     } else {

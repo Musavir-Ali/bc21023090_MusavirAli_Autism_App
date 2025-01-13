@@ -10,10 +10,10 @@ class AccountController extends GetxController {
 
   TextEditingController userName = TextEditingController();
   TextEditingController password = TextEditingController();
-  TextEditingController newPassword = TextEditingController();
+  TextEditingController reEnterPassword = TextEditingController();
 
   String? otp;
-  bool isLoginAction = true; // This flag will help us determine which action to validate for
+  bool isLoginAction = true; 
 
   final adminNotifications = false.obs;
   final chatNotifications = false.obs;
@@ -23,7 +23,7 @@ class AccountController extends GetxController {
 
   final isFaqExpanded = false.obs;
 
-  // Added properties for resend email functionality
+
   final resendCounter = 20.obs;
   final canResend = false.obs;
   final isResendLoading = false.obs;

@@ -6,6 +6,7 @@ import 'package:autism_app/components/custom_text.dart';
 import 'package:autism_app/utils/constants.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -27,8 +28,7 @@ class _DashboardState extends State<Dashboard> {
   Future<void> _loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _userName = prefs.getString('name') ?? 'User'; // Default to 'User' if no name is found
-     // _profileImagePath = prefs.getString('profileImage');
+      _userName = prefs.getString('name') ?? 'User';
     });
   }
 
@@ -66,7 +66,7 @@ class _DashboardState extends State<Dashboard> {
                         Get.to(() => ProfileScreen());
                       },
                       child: UserAvatar(profileImagePath: _profileImagePath,
-    userName: _userName,),
+                       userName: _userName,),
                     ),
                   ],
                 ),
@@ -139,6 +139,23 @@ class _DashboardState extends State<Dashboard> {
                     'Pay attention to non-verbal cues such as body language, facial expressions, and tone of voice. '
                     'Improving non-verbal communication can help in building trust and understanding in conversations.',
               ),
+              const SizedBox(height: 24),
+              _buildSectionTitle('Know More About Autism'),
+              _buildRecommendationCard(
+                context,
+                title: 'Autism Spectrum Disorder (ASD)',
+                description:
+                    'Click to learn more about Autism Spectrum Disorder (ASD) and its symptoms, diagnosis, and treatment options.',
+                    descriptionColor: Colors.blue,
+                    onTap: () async {
+                    final url = Uri.parse('https://www.nimh.nih.gov/health/topics/autism-spectrum-disorders-asd');
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+              ),
             ],
           ),
         ),
@@ -155,12 +172,16 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _buildRecommendationCard(
-    BuildContext context, {
-    required String title,
-    required String description,
-  }) {
-    return Card(
+Widget _buildRecommendationCard(
+  BuildContext context, {
+  required String title,
+  required String description,
+  VoidCallback? onTap, 
+  Color? descriptionColor, 
+}) {
+  return GestureDetector(
+    onTap: onTap, 
+    child: Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -177,14 +198,15 @@ class _DashboardState extends State<Dashboard> {
             CustomText(
               text: description,
               fontSize: 1.6,
+              color: descriptionColor ?? Colors.black, 
             ),
           ],
         ),
       ),
-    );
-  }
-}
- 
+    ),
+  );
+}}
+
 class UserAvatar extends StatelessWidget {
   final String? profileImagePath;
   final String? userName;

@@ -18,9 +18,3 @@ final formDateFormat = DateFormat('MM/dd/yyyy');
 const socialAssetPaths = 'assets/icons/social';
 const dashboardAssetPath = 'assets/icons/dashboard';
 const accountAssetPath = 'assets/icons/account';
-
-// enum UserType {
-//   admin,
-//   leader,
-//   member,
-// }

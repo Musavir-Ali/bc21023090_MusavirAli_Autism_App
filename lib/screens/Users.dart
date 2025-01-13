@@ -24,29 +24,51 @@ class _UsersScreenState extends State<UsersScreen> {
       if (currentUser == null) return;
 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users') // Assuming current user's role is in 'users' collection
+          .collection('users') 
           .doc(currentUser.uid)
           .get();
 
       setState(() {
-        currentRole = userDoc['role']; // Fetch role of current user
+        currentRole = userDoc['role'];
       });
     } catch (e) {
       print("Error fetching current user role: $e");
     }
   }
 
-  Future<List<Map<String, dynamic>>> fetchProfiles() async {
+  Future<List<Map<String, dynamic>>> fetchProfilesWithReports() async {
     try {
       QuerySnapshot profilesSnapshot = await FirebaseFirestore.instance
-          .collection('profiles') // Fetch from profiles collection
+          .collection('profiles') 
           .get();
 
-      return profilesSnapshot.docs
+      List<Map<String, dynamic>> profiles = profilesSnapshot.docs
           .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
           .toList();
+
+      for (var profile in profiles) {
+        QuerySnapshot reportsSnapshot = await FirebaseFirestore.instance
+            .collection('reports')
+            .where('uid', isEqualTo: profile['id'])
+            .orderBy('timestamp', descending: true) 
+            .limit(1)
+            .get();
+              if (reportsSnapshot.docs.isNotEmpty) {
+        var latestReport = reportsSnapshot.docs.first.data();
+        int selectedActivitiesCount =
+            (latestReport as Map<String, dynamic>?)?['selectedActivities']?.length ?? 0;
+
+        profile['latestReport'] = latestReport; 
+        profile['selectedActivitiesCount'] = selectedActivitiesCount;
+      } else {
+        profile['latestReport'] = null;
+        profile['selectedActivitiesCount'] = 0;
+      }
+      }
+
+      return profiles;
     } catch (e) {
-      print("Error fetching profiles: $e");
+      //print("Error fetching profiles or reports: $e");
       return [];
     }
   }
@@ -66,7 +88,7 @@ class _UsersScreenState extends State<UsersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: fetchProfiles(),
+        future: fetchProfilesWithReports(),
         builder: (context, profilesSnapshot) {
           if (profilesSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -80,8 +102,9 @@ class _UsersScreenState extends State<UsersScreen> {
               itemCount: profiles.length,
               itemBuilder: (context, index) {
                 Map<String, dynamic> profile = profiles[index];
-                String name = profile['name'] ?? 'Unknown'; // Display name from profile
-                String userId = profile['id']; // Get user ID from profile
+                String name = profile['name'] ?? 'Unknown'; 
+                String userId = profile['id']; 
+                int selectedActivitiesCount = profile['selectedActivitiesCount'] ?? 0;
 
                 return Card(
                   margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -92,11 +115,12 @@ class _UsersScreenState extends State<UsersScreen> {
                     leading: CircleAvatar(
                       backgroundColor: Colors.teal,
                       child: Text(
-                        name[0].toUpperCase(), // Use first letter of the name
+                        name[0].toUpperCase(),
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
-                    title: Text(name), // Display name
+                    title: Text(name),
+                    subtitle: Text("$selectedActivitiesCount/5 activities"), 
                     trailing: currentRole == 'Admin'
                         ? IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
@@ -131,7 +155,7 @@ class _UsersScreenState extends State<UsersScreen> {
                               );
                             },
                           )
-                        : null, // Show delete icon only for Admin
+                        : null,
                   ),
                 );
               },

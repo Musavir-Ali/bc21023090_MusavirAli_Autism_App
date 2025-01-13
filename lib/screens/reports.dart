@@ -29,7 +29,7 @@ class Reports extends StatelessWidget {
           return StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('recommendations')
-                .where('assessmentUID', isEqualTo: currentUserUid) // Filter recommendations by UID
+                .where('assessmentUID', isEqualTo: currentUserUid) 
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -57,7 +57,7 @@ class Reports extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                     child: ListTile(
                       title: CustomText(text: title),
-                      subtitle: CustomText(text:details),
+                      subtitle: SelectableText(details),
                     ),
                   );
                 },

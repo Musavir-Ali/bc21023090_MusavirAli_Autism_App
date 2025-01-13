@@ -1,4 +1,7 @@
+import 'package:autism_app/components/view_common.dart';
 import 'package:autism_app/controllers/speech_controller.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:autism_app/components/custom_text.dart';
 import 'package:autism_app/utils/constants.dart';
@@ -48,13 +51,15 @@ class ExercisesScreen extends StatelessWidget {
               ListeningExercise(),
             ),
             
-            // CommonButton(
-            //   title: 'Send Report',
-            //   bgColor: Color(successColor).value,
-            //   onPressed: () {
-               
-            //   },
-            // ),
+            CommonButton(
+              title: 'Send Report',
+              bgColor: Color(successColor).value,
+              onPressed: () {  
+                  ViewsCommon.showModalBottom(
+                  _buildSendReportContent(),
+                );              
+              },
+            ),
           ],
         ),
       ),
@@ -96,7 +101,7 @@ class ExercisesScreen extends StatelessWidget {
   }
 }
 
-// 
+ 
 class SpeechRecognitionExercise extends StatelessWidget {
   final SpeechRecognitionController controller = Get.put(SpeechRecognitionController());
   final TextEditingController customTextController = TextEditingController();
@@ -437,3 +442,102 @@ class _WordObjectMatchingExerciseState extends State<WordObjectMatchingExercise>
     );
   }
 }
+
+
+Widget _buildSendReportContent() {
+  final List<String> options = [
+    "Emotion Matching",
+    "Complete the Sentence",
+    "Word-Object Matching",
+    "Read Aloud",
+    "Listen and Repeat",
+  ];
+  final Map<String, bool> selectedOptions = {for (var option in options) option: false};
+
+  Future<void> sendReport() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        Get.snackbar("Error", "No user is currently logged in.");
+        return;
+      }
+      final uid = user.uid;
+      final doc = await FirebaseFirestore.instance.collection('profiles').doc(uid).get();
+
+      if (!doc.exists) {
+        Get.snackbar("Error", "User profile not found in the database.");
+        return;
+      }
+
+      final profileData = doc.data();
+      print("User Profile Data: $profileData");
+      final selectedActivities = selectedOptions.entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key)
+          .toList();
+
+      if (selectedActivities.isEmpty) {
+        Get.snackbar("Error", "No activities selected.");
+        return;
+      }
+      final reportData = {
+        "uid": uid,
+        "selectedActivities": selectedActivities,
+        "timestamp": FieldValue.serverTimestamp() ,
+      };
+      await FirebaseFirestore.instance.collection('reports').add(reportData);
+      selectedOptions.updateAll((key, value) => false);
+     Get.snackbar("Success", "Report sent successfully.");
+     Navigator.pop(Get.overlayContext!);
+    } catch (e) {
+      Get.snackbar("Error", "Failed to send report: ${e.toString()}");
+    }
+  }
+
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Send Report',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: options.length,
+                itemBuilder: (context, index) {
+                  final option = options[index];
+                  return CheckboxListTile(
+                    title: Text(option),
+                    value: selectedOptions[option],
+                    onChanged: (value) {
+                      setState(() {
+                        selectedOptions[option] = value ?? false;
+                      });
+                    },
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 16),
+            CommonButton(
+              title: 'Send',
+              onPressed: () {
+                sendReport();
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+
