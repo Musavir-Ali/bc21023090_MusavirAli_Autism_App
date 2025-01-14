@@ -67,7 +67,6 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Save the profile data to Firestore
         await FirebaseFirestore.instance.collection('profiles').doc(user.uid).set({
           'uid': user.uid,
           'name': _nameController.text,
@@ -77,7 +76,6 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
           'weight': _weightController.text,
           'history': _historyController.text,
           'lifestyle': _lifestyleController.text,
-          // If profile image is selected, save its URL to Firestore (you can upload the image to Firebase Storage first)
           'profileImage': _profileImage != null ? File(_profileImage!.path).path : null,
         });
         print(user.displayName);

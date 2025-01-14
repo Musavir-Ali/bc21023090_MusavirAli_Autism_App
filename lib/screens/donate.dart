@@ -83,7 +83,6 @@ class _DonateState extends State<Donate> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Total Donations Text
             Text(
               "The total donations are \$${totalDonations.toStringAsFixed(2)}",
               style: const TextStyle(
@@ -192,8 +191,6 @@ class _DonateState extends State<Donate> {
                           );
 
                           _fetchTotalDonations();
-
-                          // Clear fields
                           _amountController.clear();
                           setState(() {
                             selectedUserId = null;

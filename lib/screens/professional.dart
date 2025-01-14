@@ -54,14 +54,11 @@ class _ProfessionalScreenState extends State<ProfessionalScreen> {
 
   Future<void> deleteProfessional(String userId) async {
     try {
-      // Delete user from the 'users' collection
       await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-
-      // Optionally delete the user's profile from the 'basic_profiles' collection
       await FirebaseFirestore.instance.collection('basic_profiles').doc(userId).delete();
 
       print("Professional with ID $userId deleted successfully.");
-      setState(() {}); // Refresh the UI
+      setState(() {}); 
     } catch (e) {
       print("Error deleting professional: $e");
     }

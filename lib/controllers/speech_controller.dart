@@ -43,11 +43,10 @@ class SpeechRecognitionController extends GetxController {
   
 
 void evaluateReading() {
-  // Clean up whitespace and punctuation for both texts
+
   String cleanRecognized = recognizedText.value.trim().toLowerCase();
   String cleanParagraph = paragraph.trim().toLowerCase();
 
-  // Check for an exact or partial match threshold (e.g., 80% of the text)
   if (cleanRecognized == cleanParagraph) {
     feedback.value = 'Great job! You read the paragraph correctly.';
   } else if (cleanRecognized.contains(cleanParagraph.substring(0, (cleanParagraph.length * 0.8).toInt()))) {

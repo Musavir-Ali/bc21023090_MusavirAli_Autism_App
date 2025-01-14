@@ -20,7 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _weight;
   String? _history;
   String? _lifestyle;
-  String? _amount; // New field for amount
+  String? _amount; 
 
   @override
   void initState() {
@@ -38,7 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       String userId = user.uid;
 
-      // Fetch the user’s role
       DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
           .collection('users')
           .doc(userId)
@@ -46,7 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (userSnapshot.exists) {
         setState(() {
-          _role = userSnapshot['role']; // Get the role field
+          _role = userSnapshot['role'];
         });
         _loadProfileData(userId);
       }
@@ -98,7 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .get();
 
       if (amountSnapshot.docs.isNotEmpty) {
-        // Sum up all amounts where name matches
         double totalAmount = 0;
         for (var doc in amountSnapshot.docs) {
           totalAmount += (doc['amount'] as num).toDouble();
@@ -132,11 +130,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     CircleAvatar(
                       radius: 60,
-                      backgroundColor: Colors.green, // Set green background color
+                      backgroundColor: Colors.green, 
                       child: Text(
                         _name != null && _name!.isNotEmpty
-                            ? _name![0].toUpperCase() // First letter of the name
-                            : '?', // Default placeholder if name is not set
+                            ? _name![0].toUpperCase() 
+                            : '?',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 32.0,
@@ -161,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _buildProfileCard('Weight', '$_weight kg'),
                 _buildProfileCard('Medical History', _history),
                 _buildProfileCard('Lifestyle', _lifestyle),
-                _buildProfileCard('Amount', _amount), // New field
+                _buildProfileCard('Amount', _amount),
               ],
               SizedBox(height: heightSpace(4)),
             ],

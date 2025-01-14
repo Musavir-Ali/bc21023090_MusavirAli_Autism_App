@@ -14,7 +14,7 @@ class _ProfessionalsScreenState extends State<ProfessionalsScreen> {
   final _formKey = GlobalKey<FormState>();
 
   String? selectedName;
-  String? selectedUid; // To store the UID of the selected person
+  String? selectedUid; 
   String interactionLevel = 'Low';
   String behaviorPatterns = '';
   String sensoryResponse = 'Normal';
@@ -49,7 +49,7 @@ class _ProfessionalsScreenState extends State<ProfessionalsScreen> {
                               value: doc['name'],
                               child: Text(doc['name']),
                               onTap: () {
-                                // Store the UID of the selected profile
+                               
                                 selectedUid = doc.id;
                               },
                             );
@@ -118,7 +118,7 @@ class _ProfessionalsScreenState extends State<ProfessionalsScreen> {
                         if (selectedUid != null) {
                           try {
                             await FirebaseFirestore.instance.collection('assessments').add({
-                              'uid': selectedUid, // Save the UID from profiles
+                              'uid': selectedUid, 
                               'name': selectedName!,
                               'interactionLevel': interactionLevel,
                               'behaviorPatterns': behaviorPatterns,
